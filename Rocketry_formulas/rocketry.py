@@ -118,7 +118,7 @@ def calculate_Cf_fixed_nozzle(k: float, area_exit: float, area_throat: float, pr
    :type pressure_ambient: float
    """
 
-   Cf = calculate_Cf_ideal(k, pressure_exit, pressure_chamber)
+   Cf = calculate_Cf_ideal(k, pressure_chamber, pressure_exit)
    pressure_coefficient = area_exit/area_throat * (pressure_exit-pressure_ambient)/pressure_chamber
 
    return Cf + pressure_coefficient

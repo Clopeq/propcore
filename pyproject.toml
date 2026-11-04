@@ -1,3 +1,35 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "rocketry-formulas"
+version = "0.1.0"
+description = "Rocket propulsion and test-data formulas for the ABORT project"
+readme = "README.md"
+requires-python = ">=3.14"
+authors = [
+	{ name = "Sebastian Krol" },
+]
+license = { text = "MIT" }
+dependencies = [
+	"numpy",
+	"scipy",
+]
+classifiers = [
+	"Development Status :: 3 - Alpha",
+	"Intended Audience :: Science/Research",
+	"License :: OSI Approved :: MIT License",
+	"Programming Language :: Python :: 3",
+	"Programming Language :: Python :: 3 :: Only",
+	"Operating System :: OS Independent",
+	"Topic :: Scientific/Engineering",
+]
+
+[project.urls]
+Homepage = "https://github.com/Clopeq/Rocketry_formulas"
+Repository = "https://github.com/Clopeq/Rocketry_formulas"
+Issues = "https://github.com/Clopeq/Rocketry_formulas/issues"
+
+[tool.setuptools.packages.find]
+include = ["Rocketry_formulas*"]

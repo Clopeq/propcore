@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+Rocketry_formulas/__init__.py
+Rocketry_formulas/analysis.py
+Rocketry_formulas/rocketry.py
+rocketry_formulas.egg-info/PKG-INFO
+rocketry_formulas.egg-info/SOURCES.txt
+rocketry_formulas.egg-info/dependency_links.txt
+rocketry_formulas.egg-info/requires.txt
+rocketry_formulas.egg-info/top_level.txt

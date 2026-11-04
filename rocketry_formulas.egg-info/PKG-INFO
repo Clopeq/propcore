@@ -1,0 +1,71 @@
+Metadata-Version: 2.4
+Name: rocketry-formulas
+Version: 0.1.0
+Summary: Rocket propulsion and test-data formulas for the ABORT project
+Author: Sebastian Krol
+License: MIT
+Project-URL: Homepage, https://github.com/Clopeq/Rocketry_formulas
+Project-URL: Repository, https://github.com/Clopeq/Rocketry_formulas
+Project-URL: Issues, https://github.com/Clopeq/Rocketry_formulas/issues
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >=3.14
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: scipy
+Dynamic: license-file
+
+# Rocketry Formulas
+
+Rocketry Formulas is a small Python library of rocket propulsion equations and
+helpers for processing motor test data.
+
+## Installation
+
+```bash
+pip install rocketry-formulas
+```
+
+To install the latest development version directly from GitHub:
+
+```bash
+pip install git+https://github.com/Clopeq/Rocketry_formulas.git
+```
+
+## Usage
+
+```python
+from Rocketry_formulas import calculate_cstar_ideal, calculate_impulse
+
+cstar = calculate_cstar_ideal(
+	k=1.2,
+	Rs=355.0,
+	temperature_combustion=3200.0,
+)
+impulse = calculate_impulse(
+	thrust=[0.0, 100.0, 0.0],
+	time=[0.0, 1.0, 2.0],
+)
+```
+
+The `Rocketry_formulas.rocketry` module contains propulsion and nozzle
+equations. The `Rocketry_formulas.analysis` module contains CSV and test-data
+helpers.
+
+## Development
+
+Install the package in editable mode:
+
+```bash
+pip install -e .
+```
+
+## License
+
+This project is released under the MIT License.
