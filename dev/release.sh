@@ -42,10 +42,11 @@ if [[ "${options[$selected]}" == "Exit" ]]; then
     echo "Exiting without releasing."
     exit 0
 fi
-uv version -- bump "${options[$selected]}"
+uv version --bump "${options[$selected]}"
 V=$(uv version --short)
 git add pyproject.toml # or git add .
 git commit -m "Release $V"
 git tag "v$V"
 git push origin HEAD "v$V"
+clear
 echo "Released v$V"

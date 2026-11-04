@@ -2,7 +2,7 @@
 
 git add .
 git commit -m "commit message"
-(optional) git push -u origin main
+git push -u origin main
 bash ./dev/release.sh
 
 # Choose the realease option
