@@ -1,6 +1,9 @@
-# 1. bump version = "..." in pyproject.toml, then:
-git add pyproject.toml
-git commit -m "Release 0.1.0"
-git push
-git tag v0.1.0
-git push origin v0.1.0
+#Perform all neccesary changes to the library
+
+git add .
+git commit -m "commit message"
+(optional) git push -u origin main
+bash ./dev/release.sh
+
+# Choose the realease option
+# In couple of minutes new version should be available on PyPi

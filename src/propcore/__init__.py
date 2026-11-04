@@ -1,6 +1,7 @@
 # propcore/__init__.py
+from importlib.metadata import version
 
-__version__ = "0.1.0"
+__version__ = version("propcore")
 
 from .analysis import (
     average_smoothing,
