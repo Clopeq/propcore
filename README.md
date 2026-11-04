@@ -1,24 +1,24 @@
-# Rocketry Formulas
+# Propcore
 
-Rocketry Formulas is a small Python library of rocket propulsion equations and
+Propcore is a small Python library of rocket propulsion equations and
 helpers for processing motor test data.
 
 ## Installation
 
 ```bash
-pip install rocketry-formulas
+pip install propcore
 ```
 
 To install the latest development version directly from GitHub:
 
 ```bash
-pip install git+https://github.com/Clopeq/Rocketry_formulas.git
+pip install git+https://github.com/Clopeq/propcore.git
 ```
 
 ## Usage
 
 ```python
-from Rocketry_formulas import calculate_cstar_ideal, calculate_impulse
+from propcore import calculate_cstar_ideal, calculate_impulse
 
 cstar = calculate_cstar_ideal(
 	k=1.2,
@@ -31,8 +31,8 @@ impulse = calculate_impulse(
 )
 ```
 
-The `Rocketry_formulas.rocketry` module contains propulsion and nozzle
-equations. The `Rocketry_formulas.analysis` module contains CSV and test-data
+The `propcore.rocketry` module contains propulsion and nozzle
+equations. The `propcore.analysis` module contains CSV and test-data
 helpers.
 
 ## Development

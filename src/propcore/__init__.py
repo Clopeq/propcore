@@ -1,4 +1,4 @@
-# Rocketry_formulas/__init__.py
+# propcore/__init__.py
 
 __version__ = "0.1.0"
 

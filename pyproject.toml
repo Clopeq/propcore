@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "rocketry-formulas"
+name = "propcore"
 version = "0.1.0"
 description = "Rocket propulsion and test-data formulas for the ABORT project"
 readme = "README.md"
@@ -11,7 +11,7 @@ requires-python = ">=3.14"
 authors = [
 	{ name = "Sebastian Krol" },
 ]
-license = { text = "MIT" }
+license = { file = "LICENSE" }
 dependencies = [
 	"numpy",
 	"scipy",
@@ -27,9 +27,13 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Clopeq/Rocketry_formulas"
-Repository = "https://github.com/Clopeq/Rocketry_formulas"
-Issues = "https://github.com/Clopeq/Rocketry_formulas/issues"
+Homepage = "https://github.com/Clopeq/propcore"
+Repository = "https://github.com/Clopeq/propcore"
+Issues = "https://github.com/Clopeq/propcore/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
-include = ["Rocketry_formulas*"]
+where = ["src"]
+include = ["propcore*"]
