@@ -37,6 +37,7 @@ from .flow import (
     dyer,
     HEM_raw,
     HEM,
+    FML_raw,
     FML
 )
 
@@ -67,5 +68,6 @@ __all__ = [
     "dyer",
     "HEM_raw",
     "HEM",
+    "FML_raw",
     "FML"
 ]

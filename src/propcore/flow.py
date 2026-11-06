@@ -203,7 +203,15 @@ def HEM(
             fluid
         )
 
-def FML(upstream_pressure: float, downstream_pressure: float, orifice_area: float, discharge_coefficient: float, upstream_temperature: float | str = "SAT", fluid: str = "N2O") -> float:
+def FML_raw(
+        upstream_pressure: float, 
+        downstream_pressure: float, 
+        orifice_area: float, 
+        discharge_coefficient: float, 
+        upstream_temperature: float | str = "SAT", 
+        upstream_vapor_quality: float = 0.0,
+        fluid: str = "N2O"
+    ) -> float:
     """
     Calculate the mass flow rate through an orifice using the FML (Foletti–Magni–La Luna) model.
     """
@@ -216,10 +224,87 @@ def FML(upstream_pressure: float, downstream_pressure: float, orifice_area: floa
 
 
     if SATURATED:
-        s_up = cp.PropsSI("S", "P", upstream_pressure, "Q", 1, fluid)
+        # upstream conditions are saturated
+        s_up = cp.PropsSI("S", "P", upstream_pressure, "Q", upstream_vapor_quality, fluid)
     else:
         # supercharged upstream conditions
         s_up = cp.PropsSI("S", "P", upstream_pressure, "T", upstream_temperature, fluid)
 
+    T_down = cp.PropsSI("T", "P", downstream_pressure, "S", s_up, fluid)
+    s_v_down = cp.PropsSI("S", "P", downstream_pressure, "Q", 1, fluid)
+    s_l_down = cp.PropsSI("S", "P", downstream_pressure, "Q", 0, fluid)
+    rho_v_down = cp.PropsSI("D", "P", downstream_pressure, "Q", 1, fluid)
+    rho_l_down = cp.PropsSI("D", "P", downstream_pressure, "Q", 0, fluid)
 
-    raise NotImplementedError("FML model is not implemented yet.")
+    x = (s_up - s_l_down)/(s_v_down - s_l_down)
+    S = (rho_l_down/rho_v_down)**(1/3) # slip ratio
+    alpha = 1 / (1 + (1-x)/x * S * rho_v_down/rho_l_down)
+
+    mdot_SPI = SPI(
+        upstream_pressure, 
+        downstream_pressure, 
+        orifice_area, 
+        discharge_coefficient, 
+        cp.PropsSI("D", "P", upstream_pressure, "Q", upstream_vapor_quality, fluid)
+    )
+
+    mdot_HEM = HEM(
+        upstream_pressure, 
+        downstream_pressure, 
+        orifice_area, 
+        discharge_coefficient, 
+        upstream_temperature, 
+        upstream_vapor_quality,
+        fluid
+    )
+    
+    mdot_l = (1-alpha)*mdot_SPI + alpha*mdot_HEM
+    mdot_v = alpha*mdot_SPI + (1-alpha)*mdot_HEM
+    return upstream_vapor_quality*mdot_v + (1-upstream_vapor_quality)*mdot_l
+
+def FML(
+        upstream_pressure: float, 
+        downstream_pressure: float, 
+        orifice_area: float, 
+        discharge_coefficient: float, 
+        upstream_temperature: float | str = "SAT", 
+        upstream_vapor_quality: float = 0.0,
+        fluid: str = "N2O"
+    ) -> float:
+    """
+    Calculate the mass flow rate through an orifice using the FML (Foletti–Magni–La Luna) model.
+    """
+    result = minimize_scalar(
+        lambda p: -FML_raw(
+            upstream_pressure, 
+            p, 
+            orifice_area, 
+            discharge_coefficient, 
+            upstream_temperature, 
+            upstream_vapor_quality, 
+            fluid
+        ), 
+        bounds = (1e5, upstream_pressure), 
+        method="bounded"
+    )
+
+    if downstream_pressure > result.x:
+        return FML_raw(
+            upstream_pressure, 
+            downstream_pressure, 
+            orifice_area, 
+            discharge_coefficient, 
+            upstream_temperature, 
+            upstream_vapor_quality, 
+            fluid
+        )
+    else:
+        return FML_raw(
+            upstream_pressure, 
+            result.x, 
+            orifice_area, 
+            discharge_coefficient, 
+            upstream_temperature, 
+            upstream_vapor_quality, 
+            fluid
+        )
