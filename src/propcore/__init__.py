@@ -22,6 +22,24 @@ from .rocketry import (
     calculate_isp_ideal,
 )
 
+from .N2O import (
+    n2o_sat_p_from_t,
+    n2o_sat_t_from_p,
+    n2o_gas_density_from_t,
+    n2o_gas_density_from_p,
+    n2o_liquid_density_from_t,
+    n2o_liquid_density_from_p
+)
+
+from .flow import (
+    SPI,
+    SPC,
+    dyer,
+    HEM_raw,
+    HEM,
+    FML
+)
+
 __all__ = [
     "__version__",
     "average_smoothing",
@@ -38,4 +56,16 @@ __all__ = [
     "calculate_isp",
     "calculate_isp_cstar_Cf",
     "calculate_isp_ideal",
+    "n2o_sat_p_from_t",
+    "n2o_sat_t_from_p",
+    "n2o_gas_density_from_t",
+    "n2o_gas_density_from_p",
+    "n2o_liquid_density_from_t",
+    "n2o_liquid_density_from_p",
+    "SPI",
+    "SPC",
+    "dyer",
+    "HEM_raw",
+    "HEM",
+    "FML"
 ]
