@@ -1,14 +1,46 @@
 
-from math import sqrt
+from math import isfinite, sqrt
 import CoolProp.CoolProp as cp
 from scipy.optimize import minimize_scalar
 from scipy.constants import R
+
+
+def _validate_pressure_inputs(upstream_pressure: float, downstream_pressure: float) -> None:
+    if not isfinite(upstream_pressure) or not isfinite(downstream_pressure):
+        raise ValueError("Upstream and downstream pressures must be finite numbers.")
+    if upstream_pressure <= 0.0 or downstream_pressure <= 0.0:
+        raise ValueError("Pressure inputs must be strictly positive.")
+    if downstream_pressure >= upstream_pressure:
+        raise ValueError("Downstream pressure must be strictly lower than upstream pressure.")
+
+
+def _validate_orifice_inputs(orifice_area: float, discharge_coefficient: float, density: float | None = None) -> None:
+    if not isfinite(orifice_area) or not isfinite(discharge_coefficient):
+        raise ValueError("Orifice area and discharge coefficient must be finite numbers.")
+    if orifice_area <= 0.0:
+        raise ValueError("Orifice area must be strictly positive.")
+    if discharge_coefficient <= 0.0:
+        raise ValueError("Discharge coefficient must be strictly positive.")
+    if density is not None and (not isfinite(density) or density <= 0.0):
+        raise ValueError("Density must be a finite, strictly positive value.")
+
+
+def _bounded_downstream_pressure(upstream_pressure: float) -> tuple[float, float]:
+    if not isfinite(upstream_pressure) or upstream_pressure <= 0.0:
+        raise ValueError("Upstream pressure must be a finite, strictly positive value.")
+    lower = max(1e-12, 1e-6 * upstream_pressure)
+    if lower >= upstream_pressure:
+        lower = upstream_pressure * 0.5
+    return lower, upstream_pressure
+
 
 def SPI(upstream_pressure: float, downstream_pressure: float, orifice_area: float, discharge_coefficient: float, density: float) -> float:
     """
     Calculate the mass flow rate through an orifice using the SPI (Single Phase Incompressible) model.
     """
-    return discharge_coefficient * orifice_area * sqrt(2*(upstream_pressure-downstream_pressure)*density)
+    _validate_pressure_inputs(upstream_pressure, downstream_pressure)
+    _validate_orifice_inputs(orifice_area, discharge_coefficient, density)
+    return discharge_coefficient * orifice_area * sqrt(2 * (upstream_pressure - downstream_pressure) * density)
 
 def SPC(
         upstream_pressure: float, 
@@ -22,6 +54,9 @@ def SPC(
     """
     Calculate the mass flow rate through an orifice using the SPC (Single Phase Compressible) model.
     """
+    _validate_pressure_inputs(upstream_pressure, downstream_pressure)
+    _validate_orifice_inputs(orifice_area, discharge_coefficient)
+
     Tsat = cp.PropsSI("T", "P", upstream_pressure, "Q", 0, fluid)
     if upstream_temperature == "SAT":
         upstream_temperature = cp.PropsSI("T", "P", upstream_pressure, "Q", 0, fluid)
@@ -91,6 +126,9 @@ def dyer_raw(
     """
     Calculate the mass flow rate through an orifice using the Dyer model.
     """
+    _validate_pressure_inputs(upstream_pressure, downstream_pressure)
+    _validate_orifice_inputs(orifice_area, discharge_coefficient)
+
     if upstream_temperature == "SAT" or abs(upstream_temperature - cp.PropsSI("T", "P", upstream_pressure, "Q", 0 , fluid)) < 1e-3:
         # Upstream conditions are saturated
         p_vap = upstream_pressure
@@ -103,8 +141,10 @@ def dyer_raw(
         if upstream_pressure < p_vap:   # if this check fails the fluid is supercharged
             # "Subcharged" upstream conditions (gas only)
             raise ValueError("Upstream pressure is below the vapor pressure at the given upstream temperature. The Dyer model is not valid for this case.")
-        
-    
+
+    if downstream_pressure >= p_vap:
+        raise ValueError("The Dyer model requires downstream pressure to be lower than the saturation pressure of the upstream state.")
+
     k = sqrt((upstream_pressure-downstream_pressure)/(p_vap-downstream_pressure))
 
     mdot_SPI = SPI(
@@ -140,6 +180,9 @@ def dyer_raw_compressible(
     """
     Calculate the mass flow rate through an orifice using the Dyer model.
     """
+    _validate_pressure_inputs(upstream_pressure, downstream_pressure)
+    _validate_orifice_inputs(orifice_area, discharge_coefficient)
+
     if upstream_temperature == "SAT" or abs(upstream_temperature - cp.PropsSI("T", "P", upstream_pressure, "Q", 0 , fluid)) < 1e-3:
         # Upstream conditions are saturated
         p_vap = upstream_pressure
@@ -152,8 +195,10 @@ def dyer_raw_compressible(
         if upstream_pressure < p_vap:   # if this check fails the fluid is supercharged
             # "Subcharged" upstream conditions (gas only)
             raise ValueError("Upstream pressure is below the vapor pressure at the given upstream temperature. The Dyer model is not valid for this case.")
-        
-    
+
+    if downstream_pressure >= p_vap:
+        raise ValueError("The Dyer model requires downstream pressure to be lower than the saturation pressure of the upstream state.")
+
     k = sqrt((upstream_pressure-downstream_pressure)/(p_vap-downstream_pressure))
 
     mdot_SPC = SPC(
@@ -191,6 +236,7 @@ def dyer(
     """
     Calculate the mass flow rate through an orifice using the Dyer model.
     """
+    lower, upper = _bounded_downstream_pressure(upstream_pressure)
     result = minimize_scalar(
         lambda p: -dyer_raw(
             upstream_pressure, 
@@ -201,7 +247,7 @@ def dyer(
             upstream_vapor_quality,
             fluid
         ), 
-        bounds = (1e5, upstream_pressure), 
+        bounds = (lower, upper), 
         method="bounded"
     )
 
@@ -238,6 +284,7 @@ def dyer_compressible(
     """
     Calculate the mass flow rate through an orifice using the Dyer model.
     """
+    lower, upper = _bounded_downstream_pressure(upstream_pressure)
     result = minimize_scalar(
         lambda p: -dyer_raw_compressible(
             upstream_pressure, 
@@ -248,7 +295,7 @@ def dyer_compressible(
             upstream_vapor_quality,
             fluid
         ), 
-        bounds = (1e5, upstream_pressure), 
+        bounds = (lower, upper), 
         method="bounded"
     )
 
@@ -291,6 +338,8 @@ def HEM_raw(
     - What happens when upstream quality is 1.0?
     - quality has no meaning when the fluid is not saturated. Should we raise an error in that case?
     """
+    _validate_pressure_inputs(upstream_pressure, downstream_pressure)
+    _validate_orifice_inputs(orifice_area, discharge_coefficient)
     if upstream_vapor_quality < 0.0 or upstream_vapor_quality > 1.0:
         raise ValueError("Upstream vapor quality must be between 0 and 1.")
 
@@ -327,6 +376,7 @@ def HEM(
     Calculate the mass flow rate through an orifice using the HEM (Homogeneous Equilibrium Model) model.
     """
 
+    lower, upper = _bounded_downstream_pressure(upstream_pressure)
     result = minimize_scalar(
         lambda p: -HEM_raw(
             upstream_pressure, 
@@ -337,7 +387,7 @@ def HEM(
             upstream_vapor_quality, 
             fluid
         ), 
-        bounds = (1e5, upstream_pressure), 
+        bounds = (lower, upper), 
         method="bounded"
     )
 
@@ -374,6 +424,11 @@ def FML_raw(
     """
     Calculate the mass flow rate through an orifice using the FML (Foletti–Magni–La Luna) model.
     """
+    _validate_pressure_inputs(upstream_pressure, downstream_pressure)
+    _validate_orifice_inputs(orifice_area, discharge_coefficient)
+
+    if upstream_vapor_quality < 0.0 or upstream_vapor_quality > 1.0:
+        raise ValueError("Upstream vapor quality must be between 0 and 1.")
 
     if (upstream_temperature == "SAT"):
         upstream_temperature = cp.PropsSI("T", "P", upstream_pressure, "Q", 0, fluid)
@@ -409,7 +464,7 @@ def FML_raw(
         fluid
     )
 
-    mdot_HEM = HEM(
+    mdot_HEM = HEM_raw(
         upstream_pressure, 
         downstream_pressure, 
         orifice_area, 
@@ -435,6 +490,7 @@ def FML(
     """
     Calculate the mass flow rate through an orifice using the FML (Foletti–Magni–La Luna) model.
     """
+    lower, upper = _bounded_downstream_pressure(upstream_pressure)
     result = minimize_scalar(
         lambda p: -FML_raw(
             upstream_pressure, 
@@ -445,7 +501,7 @@ def FML(
             upstream_vapor_quality, 
             fluid
         ), 
-        bounds = (1e5, upstream_pressure), 
+        bounds = (lower, upper), 
         method="bounded"
     )
 
