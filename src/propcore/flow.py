@@ -333,7 +333,7 @@ def _dyer_upstream_state(
     p_up : float
         Upstream absolute pressure in pascals.
     T_up : float or str
-        Upstream temperature in kelvins, or ``\"SAT\"`` for saturation conditions.
+        Upstream temperature in kelvins, or ``"SAT"`` for saturation conditions.
     Q_up : float
         Upstream vapor quality, dimensionless and between 0 and 1.
     fluid : str
@@ -391,7 +391,7 @@ def dyer_raw(
     C_d : float
         Dimensionless discharge coefficient.
     T_up : float or str
-        Upstream temperature in kelvins, or ``\"SAT\"`` for saturation conditions.
+        Upstream temperature in kelvins, or ``"SAT"`` for saturation conditions.
     Q_up : float
         Upstream vapor quality, dimensionless and between 0 and 1.
     fluid : str
@@ -448,7 +448,7 @@ def dyer_raw_compressible(
     C_d : float
         Dimensionless discharge coefficient.
     T_up : float or str
-        Upstream temperature in kelvins, or ``\"SAT\"`` for saturation conditions.
+        Upstream temperature in kelvins, or ``"SAT"`` for saturation conditions.
     Q_up : float
         Upstream vapor quality, dimensionless and between 0 and 1.
     fluid : str
@@ -474,6 +474,7 @@ def dyer_raw_compressible(
     mdot_HEM = HEM_raw(p_up, p_down, A_orif, C_d, T_up, Q_up, fluid)  # HEM branch [kg/s].
     w_SPC = 1 / (1 + K_blend)  # Weight assigned to the SPC branch.
     return w_SPC * mdot_SPC + (1 - w_SPC) * mdot_HEM
+
 
 def dyer(
     p_up: float,
@@ -505,7 +506,7 @@ def dyer(
     C_d : float
         Dimensionless discharge coefficient.
     T_up : float or str
-        Upstream temperature in kelvins, or ``\"SAT\"`` for saturation conditions.
+        Upstream temperature in kelvins, or ``"SAT"`` for saturation conditions.
     Q_up : float
         Upstream vapor quality, dimensionless and between 0 and 1.
     fluid : str
@@ -548,7 +549,7 @@ def dyer_compressible(
     C_d : float
         Dimensionless discharge coefficient.
     T_up : float or str
-        Upstream temperature in kelvins, or ``\"SAT\"`` for saturation conditions.
+        Upstream temperature in kelvins, or ``"SAT"`` for saturation conditions.
     Q_up : float
         Upstream vapor quality, dimensionless and between 0 and 1.
     fluid : str
@@ -604,7 +605,7 @@ def HEM_raw(
     C_d : float
         Dimensionless discharge coefficient; defaults to 1.
     T_up : float or str
-        Upstream temperature in kelvins, or ``\"SAT\"`` for saturation conditions.
+        Upstream temperature in kelvins, or ``"SAT"`` for saturation conditions.
     Q_up : float
         Upstream vapor quality, dimensionless and between 0 and 1.
     fluid : str
@@ -676,7 +677,7 @@ def HEM(
     C_d : float
         Dimensionless discharge coefficient.
     T_up : float or str
-        Upstream temperature in kelvins, or ``\"SAT\"`` for saturation conditions.
+        Upstream temperature in kelvins, or ``"SAT"`` for saturation conditions.
     Q_up : float
         Upstream vapor quality, dimensionless and between 0 and 1.
     fluid : str
@@ -722,7 +723,7 @@ def FML_raw(
     C_d : float
         Dimensionless discharge coefficient.
     T_up : float or str
-        Upstream temperature in kelvins, or ``\"SAT\"`` for saturation conditions.
+        Upstream temperature in kelvins, or ``"SAT"`` for saturation conditions.
     Q_up : float
         Upstream vapor quality, dimensionless and between 0 and 1.
     fluid : str
@@ -809,7 +810,7 @@ def FML(
     C_d : float
         Dimensionless discharge coefficient.
     T_up : float or str
-        Upstream temperature in kelvins, or ``\"SAT\"`` for saturation conditions.
+        Upstream temperature in kelvins, or ``"SAT"`` for saturation conditions.
     Q_up : float
         Upstream vapor quality, dimensionless and between 0 and 1.
     fluid : str
